@@ -15,15 +15,15 @@ ensure
   $__lua_env__ = prev
 end
 
-
 class FactorioData
   def initialize(path)
     @path = Pathname(path)
+    @data = []
     setup_lua!
   end
 
   def load!
-    load_lua!(@path + "data/base/data.lua")
+    @lua.eval("require 'data'")
   end
 
   def load_lua!(path)
@@ -32,29 +32,26 @@ class FactorioData
     end
   end
 
-  def lua_require(path)
-    load_lua! resolve_require_path(path)
-    require 'pry'; binding.pry
-  end
-
-  def resolve_require_path(req)
-    search_path = %W[factorio/data/core/lualib]
-    subpath = req.split(".").join("/") + ".lua"
-    search_path.each do |dir|
-      candidate = Pathname(dir) + subpath
-      return candidate if candidate.exist?
-    end
-    raise "Can't find #{req} in lua search path"
+  def data
+    @lua.var("data")["raw"]
   end
 
   private
 
+  def lua_path
+    [
+      "?",
+      "?.lua",
+      "#{@path.readlink + 'data/base/?' }",
+      "#{@path.readlink + 'data/base/?.lua' }",
+      "#{@path.readlink + 'data/core/lualib/?' }",
+      "#{@path.readlink + 'data/core/lualib/?.lua' }",
+    ].join(";")
+  end
+
   def setup_lua!
     @lua = Language::Lua.new()
-    @lua.eval <<-LUA
-      function require(path)
-        ruby("lua_trampoline", "lua_require", path)
-      end
-    LUA
+    @lua.eval("package.path = package.path .. '%s'" % lua_path)
+    @lua.eval("require 'dataloader'")
   end
 end

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
+require "pp"
 require_relative "../lib/factorio_data"
 
 factorio = FactorioData.new("factorio")
 factorio.load!
+pp factorio.data
