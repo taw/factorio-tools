@@ -3,5 +3,4 @@
 require_relative "../lib/factorio_data"
 
 factorio = FactorioData.new("factorio")
-
-require 'pry'; binding.pry
+factorio.load!
