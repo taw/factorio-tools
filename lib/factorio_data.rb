@@ -33,7 +33,17 @@ class FactorioData
   end
 
   def data
-    @lua.var("data")["raw"]
+    cleanup_data(@lua.var("data")["raw"])
+  end
+
+  def cleanup_data(arg)
+    return arg unless arg.is_a?(Hash)
+    expected_keys = (1..arg.keys.size).map{|i| i*1.0}
+    if arg.keys === expected_keys
+      expected_keys.map{|k| cleanup_data(arg[k])}
+    else
+      Hash[arg.keys.map{|k| [k, cleanup_data(arg[k])] }]
+    end
   end
 
   private
