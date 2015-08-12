@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/factorio_data"
+
+class HappyFactorioMod
+  def initialize
+    @game = FactorioData.new("factorio")
+    @game.load!
+    @version = "0.12.3"
+    @build_path = Pathname("build/Happy Factorio_#{@version}")
+  end
+
+  def build!
+    system "trash", @build_path.to_s if @build_path.exist?
+    @build_path.mkpath
+    (@build_path+"info.json").write <<-JSON
+      {
+        "name": "Happy Factorio",
+        "author": "taw",
+        "version": "0.12.03",
+        "title": "Happy Factorio",
+        "homepage": "",
+        "description": "High saturation textures for factorio",
+        "dependencies": ["base >= 0.12.03"]
+      }
+    JSON
+  end
+end
+
+HappyFactorioMod.new.build!
