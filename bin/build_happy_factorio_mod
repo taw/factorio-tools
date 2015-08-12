@@ -1,16 +1,22 @@
 #!/usr/bin/env ruby
 
 require_relative "../lib/factorio_data"
+require "json"
 
 class HappyFactorioMod
   def initialize
-    @game = FactorioData.new("factorio")
+    @game_path = Pathname("factorio")
+    @game = FactorioData.new(@game_path)
     @game.load!
     @version = "0.12.3"
     @build_path = Pathname("build/Happy Factorio_#{@version}")
+    @overrides_lua   = []
+    @overrides_paths = []
   end
 
   def build!
+    calculate_overrides!
+
     system "trash", @build_path.to_s if @build_path.exist?
     @build_path.mkpath
     (@build_path+"info.json").write <<-JSON
@@ -24,6 +30,51 @@ class HappyFactorioMod
         "dependencies": ["base >= 0.12.03"]
       }
     JSON
+    (@build_path+"data.lua").write(@overrides_lua.join)
+    @overrides_paths.each do |src_path, target_path|
+      target_path.parent.mkpath
+      system *%W[convert #{src_path} -modulate 100,200,100 #{target_path}]
+    end
+    # save_debug_info!
+  end
+
+  # Using #inspect to pretend lua and ruby string #inspect is same is attrociously bad coding
+  def calculate_overrides!
+    each_leaf_node do |path, val|
+      next unless val =~ /\A__base__.*\.png\z/
+      base_path = val.sub(/\A__base__\//, "")
+      new_path = val.sub(/\A__base__\//, "__Happy Factorio__/")
+
+      src_path = (@game_path + "data/base" + base_path)
+      target_path = @build_path + base_path
+      if src_path.exist?
+        @overrides_lua << %Q[data.raw#{  path.map{|x| %Q([#{x.inspect}])}.join } = #{new_path.inspect}\n]
+        @overrides_paths << [src_path, target_path]
+      else
+        STDERR.puts "#{path.join('/')} refers to an image #{val.inspect}, but it doesn't seem to exist"
+      end
+    end
+    @overrides_paths.uniq!
+  end
+
+  def each_leaf_node(node=@game.data, path=[], &blk)
+    case node
+    when Hash
+      node.each do |k,v|
+        each_leaf_node(v, path+[k], &blk)
+      end
+    when Array
+      node.each_with_index do |v,i|
+        each_leaf_node(v, path+[i+1], &blk)
+      end
+    else
+      yield(path, node)
+    end
+  end
+
+  def save_debug_info!
+    @game.lua.eval(@overrides_lua.join)
+    (@build_path+"data.json").write(JSON.pretty_generate(@game.data))
   end
 end
 

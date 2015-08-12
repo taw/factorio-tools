@@ -16,6 +16,9 @@ ensure
 end
 
 class FactorioData
+  # Not really best idea to run this, but then what are we going to do?
+  attr_reader :lua
+
   def initialize(path)
     @path = Pathname(path)
     @data = []
