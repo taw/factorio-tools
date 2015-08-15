@@ -4,11 +4,11 @@ require_relative "../lib/factorio_data"
 require "json"
 
 class HappyFactorioMod
-  def initialize
-    @game_path = Pathname("factorio")
+  def initialize(game_path="factorio")
+    @game_path = Pathname(game_path)
     @game = FactorioData.new(@game_path)
     @game.load!
-    @version = "0.12.3"
+    @version = "0.12.4"
     @build_path = Pathname("build/Happy Factorio_#{@version}")
     @overrides_lua   = []
     @overrides_paths = []
@@ -23,14 +23,14 @@ class HappyFactorioMod
       {
         "name": "Happy Factorio",
         "author": "taw",
-        "version": "0.12.03",
+        "version": #{@version.inspect},
         "title": "Happy Factorio",
         "homepage": "",
         "description": "High saturation textures for factorio",
-        "dependencies": ["base >= 0.12.03"]
+        "dependencies": ["base >= #{@version}"]
       }
     JSON
-    (@build_path+"data.lua").write(@overrides_lua.join)
+    (@build_path+"data.lua").write(@overrides_lua.sort.join)
     @overrides_paths.each do |src_path, target_path|
       target_path.parent.mkpath
       system *%W[convert #{src_path} -modulate 100,200,100 #{target_path}]
@@ -78,4 +78,4 @@ class HappyFactorioMod
   end
 end
 
-HappyFactorioMod.new.build!
+HappyFactorioMod.new(*ARGV).build!
