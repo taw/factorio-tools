@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+# Use this script to happify existing unpacked mods
+
+require "pathname"
+require "fileutils"
+
+unless ARGV.size == 2
+  STDERR.puts "Usage: #{$0} mods happy_mod"
+  exit 1
+end
+
+a = Pathname(ARGV[0])
+b = Pathname(ARGV[1])
+
+a.find do |apath|
+  bpath = b+apath.relative_path_from(a)
+  if apath.directory?
+    bpath.mkpath
+  elsif apath.extname == ".png"
+    puts "Happifying #{apath}"
+    system *%W[convert #{apath} -modulate 100,200,100 #{bpath}]
+  else
+    FileUtils.cp apath, bpath
+  end
+end
