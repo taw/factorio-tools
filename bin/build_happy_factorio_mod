@@ -8,7 +8,7 @@ class HappyFactorioMod
     @game_path = Pathname(game_path)
     @game = FactorioData.new(@game_path)
     @game.load!
-    @version = "0.12.4"
+    @version = "0.12.7"
     @build_path = Pathname("build/Happy Factorio_#{@version}")
     @overrides_lua   = []
     @overrides_paths = []
@@ -33,7 +33,7 @@ class HappyFactorioMod
     (@build_path+"data.lua").write(@overrides_lua.sort.join)
     @overrides_paths.each do |src_path, target_path|
       target_path.parent.mkpath
-      system *%W[convert #{src_path} -modulate 100,200,100 #{target_path}]
+      system *%W[convert #{src_path} -modulate 100,200,100 -strip #{target_path}]
     end
     # save_debug_info!
   end

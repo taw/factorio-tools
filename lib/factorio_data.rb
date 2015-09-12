@@ -55,10 +55,10 @@ class FactorioData
     [
       "?",
       "?.lua",
-      "#{@path.readlink + 'data/base/?' }",
-      "#{@path.readlink + 'data/base/?.lua' }",
-      "#{@path.readlink + 'data/core/lualib/?' }",
-      "#{@path.readlink + 'data/core/lualib/?.lua' }",
+      "#{@path.realpath + 'data/base/?' }",
+      "#{@path.realpath + 'data/base/?.lua' }",
+      "#{@path.realpath + 'data/core/lualib/?' }",
+      "#{@path.realpath + 'data/core/lualib/?.lua' }",
     ].join(";")
   end
 

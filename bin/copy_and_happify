@@ -19,7 +19,7 @@ a.find do |apath|
     bpath.mkpath
   elsif apath.extname == ".png"
     puts "Happifying #{apath}"
-    system *%W[convert #{apath} -modulate 100,200,100 #{bpath}]
+    system *%W[convert #{apath} -modulate 100,200,100 -strip #{bpath}]
   else
     FileUtils.cp apath, bpath
   end
