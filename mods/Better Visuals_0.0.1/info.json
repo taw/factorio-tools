@@ -1,0 +1,8 @@
+{
+  "name": "Better Visuals",
+  "author": "taw",
+  "version": "0.0.1",
+  "title": "Better Visuals",
+  "homepage": "",
+  "dependencies": ["base >= 0.12"]
+}
