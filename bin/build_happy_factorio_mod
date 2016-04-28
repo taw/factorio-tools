@@ -8,7 +8,7 @@ class HappyFactorioMod
     @game_path = Pathname(game_path)
     @game = FactorioData.new(@game_path)
     @game.load!
-    @version = "0.12.20"
+    @version = "0.12.31"
     @build_path = Pathname("build/Happy Factorio_#{@version}")
     @overrides_lua   = []
     @overrides_paths = []
