@@ -12,7 +12,7 @@ blocks:
           commands:
             - sudo apt install -y liblua5.2-dev p7zip-full
             - checkout
-            - sem-version ruby 3.1.3
+            - sem-version ruby 3.1.3 # 3.2 doesn't work with ruby-lua gem yet due to T_DATA removal
             - bundle install --path vendor/bundle
             - 'bundle exec rake factorio:fetch'
             - 'bundle exec rake factorio:unpack'
